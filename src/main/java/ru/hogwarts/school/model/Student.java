@@ -13,7 +13,6 @@ public class Student {
     private Long id;
     private String name;
     private int age;
-
     @ManyToOne
     @JsonBackReference
     private Faculty faculty;

@@ -15,7 +15,6 @@ public class Faculty {
     private Long id;
     private String name;
     private String color;
-
     @OneToMany(mappedBy = "faculty")   //фак-т в отнош.1 к мн-м со студ.,какое поле внутри ст.отвеч.за связь с фак-том
    @JsonManagedReference
     private Set<Student> students;

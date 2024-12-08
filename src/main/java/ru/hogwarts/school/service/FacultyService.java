@@ -30,7 +30,6 @@ public class FacultyService {
 
         return facultyRepository.findByColorIgnoreCase(color);
     }
-
     public Faculty updateFaculty(Faculty faculty) {
         return facultyRepository.save(faculty);
     }

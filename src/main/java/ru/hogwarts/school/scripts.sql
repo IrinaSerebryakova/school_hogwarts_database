@@ -15,3 +15,4 @@ SELECT * FROM students WHERE age<id;
 
 --5. Получить всех студентов упорядоченных по возрасту.
 SELECT * FROM students GROUP BY age;
+
