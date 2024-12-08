@@ -10,6 +10,7 @@ SELECT name FROM students;
 --«О» (или любая другая).
 SELECT * FROM students WHERE name LIKE '%о%';
 
+
 --4. Получить всех студентов, у которых возраст меньше идентификатора.
 SELECT * FROM students WHERE age<id;
 

@@ -22,7 +22,6 @@ public class FacultyService {
     public Faculty getFacultyById(Long id) {
         return facultyRepository.findById(id).get();
     }
-
     public void deleteFaculty(Long id) {
         facultyRepository.deleteById(id);
     }
