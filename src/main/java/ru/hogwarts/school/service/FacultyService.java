@@ -33,10 +33,7 @@ public class FacultyService {
     public Faculty updateFaculty(Faculty faculty) {
         return facultyRepository.save(faculty);
     }
-
     public List<Faculty> findAll() {
         return facultyRepository.findAll();
     }
-
-
 }

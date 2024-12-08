@@ -16,7 +16,6 @@ public class Student {
     @ManyToOne
     @JsonBackReference
     private Faculty faculty;
-
     public Student(Long id, String name, int age) {
         this.id = id;
         this.name = name;

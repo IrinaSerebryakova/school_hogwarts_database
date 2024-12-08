@@ -46,7 +46,6 @@ public class StudentController {
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
-
     @GetMapping("/age")
     public ResponseEntity<Collection<Student>> findByAgeBetweenMinAndMax(@RequestParam int minAge, @RequestParam int maxAge){
         if (minAge > 0 && maxAge > 0) {

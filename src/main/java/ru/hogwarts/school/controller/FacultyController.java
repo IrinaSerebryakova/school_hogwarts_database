@@ -39,13 +39,11 @@ public class FacultyController {
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
-
     @DeleteMapping("{id}")
     public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
         facultyService.deleteFaculty(id);
         return ResponseEntity.ok().build();
     }
-
     @PutMapping
     public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
         Faculty faculty2 = facultyService.updateFaculty(faculty);
