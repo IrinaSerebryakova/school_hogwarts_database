@@ -9,12 +9,14 @@ import java.util.*;
 
 @Service
 public class FacultyService {
-    private final FacultyRepository facultyRepository;
+    private FacultyRepository facultyRepository;
+
+    public FacultyService() {
+    }
 
     public FacultyService(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
     }
-
     public Faculty createFaculty(Faculty faculty) {
         return facultyRepository.save(faculty);
     }
