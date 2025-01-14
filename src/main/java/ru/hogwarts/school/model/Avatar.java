@@ -1,18 +1,15 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Value;
-import ru.hogwarts.school.repository.AvatarRepository;
-import ru.hogwarts.school.service.AvatarService;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 import static jakarta.persistence.GenerationType.AUTO;
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name="avatars")
+@Table(name = "avatars")
 public class Avatar {
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -21,6 +18,8 @@ public class Avatar {
     private long fileSize;
 
     private String mediaType;
+
+    @JsonIgnore
     @Lob
     private byte[] data;
     @OneToOne
@@ -37,7 +36,6 @@ public class Avatar {
         this.mediaType = mediaType;
         this.student = student;
     }
-
 
     public Long getId() {
         return id;
@@ -89,10 +87,9 @@ public class Avatar {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Avatar avatar = (Avatar) o;
-        return fileSize == avatar.fileSize && Objects.equals(id, avatar.id) && Objects.equals(filePath, avatar.filePath) && Objects.equals(mediaType, avatar.mediaType) && Arrays.equals(data, avatar.data) && Objects.equals(student, avatar.student);
+        return Objects.equals(id, avatar.id);
     }
 
     @Override
@@ -108,8 +105,7 @@ public class Avatar {
                 "id=" + id +
                 ", filePath='" + filePath + '\'' +
                 ", fileSize=" + fileSize +
-                ", mediaType='" + mediaType + '\'' +
-                ", data=" + Arrays.toString(data) +
+                ", mediaType='" + mediaType +
                 ", student=" + student +
                 '}';
     }
