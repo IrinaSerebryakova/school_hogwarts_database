@@ -12,7 +12,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.hogwarts.school.model.Student;
-
 import java.util.List;
 
 @Service
