@@ -5,11 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 @Service
 @Transactional
@@ -68,9 +75,14 @@ public class StudentServiceProduction implements StudentService {
         return studentRepository.findAll();
     }
 
-    public List<Integer> getAverageAge() {
+    public List<Double> getAverageAge() {
         logger.info("The method 'getAverageAge' was called");
-        return studentRepository.getAverageAge();
+        List<Student> allStudents = studentRepository.findAll();
+        double averageAge = allStudents.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0);
+        return List.of(averageAge);
     }
 
     public List<Integer> getCountOfStudents() {
@@ -86,5 +98,14 @@ public class StudentServiceProduction implements StudentService {
     public List<Student> getStudentsByName(String name) {
         logger.info("The method 'getStudentsByName' was called");
         return studentRepository.getStudentsByName(name);
+    }
+
+    public List<String> getStudentsByNameStartsWithLetter(String letter){
+        logger.info("The method 'getStudentsByNameStartsWithLetter' {} was called", letter);
+        return studentRepository.findAll().stream()
+                .filter(student -> student.getName() != null && student.getName().startsWith(letter))
+                .map(student -> student.getName().toUpperCase())
+                .sorted(Comparator.naturalOrder())
+                .collect((Collectors.toList()));
     }
 }

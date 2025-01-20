@@ -2,6 +2,7 @@ package ru.hogwarts.school.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +10,8 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyList;
 @RestController
@@ -72,11 +75,11 @@ public class StudentController {
     }
 
     @GetMapping("/average-age")
-    public ResponseEntity<List<Integer>> getAverageAge() {
-        if (studentService.findAll() != null) {
-            return ResponseEntity.ok(studentService.getAverageAge());
+    public ResponseEntity<List<Double>> getAverageAge() {
+        if (studentService.findAll() == null) {
+            return ResponseEntity.ok(emptyList());
         }
-        return ResponseEntity.ok(emptyList());
+        return ResponseEntity.ok(studentService.getAverageAge());
     }
 
     @GetMapping("/count")
@@ -99,6 +102,14 @@ public class StudentController {
     public ResponseEntity<List<Student>> getStudentsByName(@PathVariable("name") String name) {
         List<Student> students = studentService.getStudentsByName(name);
         return ResponseEntity.ok(students);
+    }
+
+    @GetMapping("/name/{letter}")
+    public ResponseEntity<List<String>> getStudentsByNameStartsWithLetter(@PathVariable("letter") String letter){
+        if (letter.length() != 1 && studentService.findAll() != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(studentService.getStudentsByNameStartsWithLetter(letter));
     }
 
 }

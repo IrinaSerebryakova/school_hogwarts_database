@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.exception.AvatarNotFoundException;
 import ru.hogwarts.school.repository.AvatarRepository;
@@ -22,8 +23,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -104,10 +107,10 @@ public class AvatarService {
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
-
     public List<Avatar> getAvatarsListFromPage(int pageNumber, int pageSize) {
         logger.info("The method 'getAvatarsListFromPage' was called");
         Page<Avatar> pageOfAvatar = avatarRepository.findAll(PageRequest.of(pageNumber, pageSize));
         return pageOfAvatar.hasContent() ? pageOfAvatar.getContent() : Collections.emptyList();
     }
+
 }

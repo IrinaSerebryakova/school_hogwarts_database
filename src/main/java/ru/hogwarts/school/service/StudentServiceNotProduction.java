@@ -69,7 +69,7 @@ private String studentUrl;
     }
 
     @Override
-    public List<Integer> getAverageAge() {
+    public List<Double> getAverageAge() {
         return List.of();
     }
 
@@ -85,6 +85,11 @@ private String studentUrl;
 
     @Override
     public List<Student> getStudentsByName(String name) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> getStudentsByNameStartsWithLetter(String letter) {
         return List.of();
     }
 }

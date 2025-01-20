@@ -182,7 +182,7 @@ public class StudentControllerTest {
 
     @Test
     public void testGetAverageAge() throws Exception {
-        List<Integer> averageAge = List.of(13);
+        List<Double> averageAge = List.of(13.0);
 
         when(studentRepository.getAverageAge()).thenReturn(averageAge);
         when(studentServiceProduction.getAverageAge()).thenReturn(averageAge);

@@ -26,9 +26,6 @@ public class FacultyController {
     @GetMapping("{id}")
     public ResponseEntity<Optional<Faculty>> getFacultyById(@PathVariable Long id) {
         Optional<Faculty> faculty1 = Optional.ofNullable(facultyService.getFacultyById(id));
-        if (faculty1 == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(faculty1);
     }
 
@@ -52,5 +49,13 @@ public class FacultyController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(faculty2);
+    }
+
+    @GetMapping("/longestName")
+    public ResponseEntity<String> getTheLongestNameOfFaculty(){
+        if(facultyService.findAll() == null){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.ok(facultyService.getTheLongestNameOfFaculty());
     }
 }

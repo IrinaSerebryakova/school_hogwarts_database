@@ -1,6 +1,7 @@
 package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.util.PropertySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -35,12 +37,8 @@ public class FacultyService {
 
     public Faculty getFacultyById(Long id) {
         logger.info("The method 'getFacultyById' was called");
-        if(facultyRepository.findById(id) == null){
-            logger.warn("The method 'findAvatarLocal' throws FacultyNotFoundException");
-            logger.debug("Please, re-run your application with 'debug'");
-        }
-        Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
-        return faculty;
+        facultyRepository.findById(id);
+        return facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
     }
 
 
@@ -56,8 +54,7 @@ public class FacultyService {
             logger.debug("Please, re-run your application with 'debug'");
             throw new FacultyNotFoundException();
         }
-        List<Faculty> faculties = facultyRepository.findByColorIgnoreCase(color);
-        return faculties;
+        return facultyRepository.findByColorIgnoreCase(color);
     }
 
     public Faculty updateFaculty(Faculty faculty) {
@@ -68,5 +65,13 @@ public class FacultyService {
     public List<Faculty> findAll() {
         logger.info("The method 'findAll' was called");
         return facultyRepository.findAll();
+    }
+
+    public String getTheLongestNameOfFaculty() {
+        logger.info("The method 'getTheLongestNameOfFaculty' was called");
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length))
+                .orElse("");
     }
 }

@@ -1,8 +1,16 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.hogwarts.school.model.Student;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 public interface StudentService {
     Student createStudent(Student student);
@@ -19,11 +27,13 @@ public interface StudentService {
 
     List<Student> findAll();
 
-    List<Integer> getAverageAge();
+    List<Double> getAverageAge();
 
     List<Integer> getCountOfStudents();
 
     List<Student> getFiveLastStudents();
 
     List<Student> getStudentsByName(String name);
+
+   List<String> getStudentsByNameStartsWithLetter(String letter);
 }
