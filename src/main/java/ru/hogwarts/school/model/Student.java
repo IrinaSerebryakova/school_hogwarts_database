@@ -2,18 +2,21 @@ package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
+
+import static jakarta.persistence.GenerationType.AUTO;
+
 @Entity
 @Table(name = "students")
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private Long id;
     private String name;
     private int age;
     @ManyToOne
+    @JoinColumn(name = "facultyid")
     @JsonBackReference
     private Faculty faculty;
     public Student(Long id, String name, int age) {

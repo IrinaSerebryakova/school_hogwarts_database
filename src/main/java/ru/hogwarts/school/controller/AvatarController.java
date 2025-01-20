@@ -1,6 +1,5 @@
 package ru.hogwarts.school.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -8,60 +7,61 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
-import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.service.AvatarService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 @RestController
-@RequestMapping("/avatar")
+@RequestMapping
 public class AvatarController {
     private final AvatarService avatarService;
-    private final StudentService studentService;
+    private final StudentService studentServiceProduction;
 
-    public AvatarController(AvatarService avatarService, StudentService studentService) {
+    public AvatarController(AvatarService avatarService, StudentService studentServiceProduction) {
         this.avatarService = avatarService;
-        this.studentService = studentService;
+        this.studentServiceProduction = studentServiceProduction;
     }
 
-    @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile avatar) throws IOException {
-
-        avatarService.uploadAvatar(id, avatar);
-        return ResponseEntity.ok().build();
+    @PostMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadAvatar(@PathVariable Long id,
+                                               @RequestParam MultipartFile avatar) throws IOException {
+        System.out.println(avatar);
+        if (!avatar.isEmpty()) {
+            avatarService.uploadAvatar(id, avatar);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
-
-    @GetMapping(value = "/{id}/avatar-from-db")
-    public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
+    @GetMapping(value = "/{id}/db")
+    public ResponseEntity<Avatar> downloadAvatar(@PathVariable Long id) {
         Avatar avatar = avatarService.findAvatar(id);
-
+        System.out.println(avatar);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
-        headers.setContentLength(avatar.getData().length);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .headers(headers)
-                .body(avatar.getData());
+        headers.setContentLength(avatar.getFileSize());
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(avatar);
     }
 
-    @GetMapping(value = "/{id}/avatar-from-file")
-    public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
-        Avatar avatar = avatarService.findAvatar(id);
+    @GetMapping(value = "/{id}/file")
+    public ResponseEntity<Avatar> downloadAvatarLocal(@PathVariable Long id) {
+        return ResponseEntity.ok(avatarService.findAvatar(id));
+    }
 
-        Path path = Path.of(avatar.getFilePath());
-        try (InputStream is = Files.newInputStream(path);
-             OutputStream os = response.getOutputStream();) {
-            response.setStatus(200);
-            response.setContentType(avatar.getMediaType());
-            response.setContentLength((int) avatar.getFileSize());
-            is.transferTo(os);
+    @GetMapping(value = "/all")
+    public ResponseEntity<List<Avatar>> getAvatarsListFromPage(@RequestParam("page") int pageNumber, @RequestParam("size") int pageSize) throws NullPointerException {
+        try {
+            if (avatarService.getAvatarsListFromPage(pageNumber, pageSize) != null) {
+                return ResponseEntity.ok(avatarService.getAvatarsListFromPage(pageNumber, pageSize));
+            }
+            return ResponseEntity.ok(emptyList());
+        } catch (NullPointerException n) {
+            throw new NullPointerException("Avatars were not download in DataBase!");
         }
     }
 }
