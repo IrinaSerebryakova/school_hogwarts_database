@@ -237,7 +237,7 @@ public class StudentControllerTest {
         when(studentRepository.findAll()).thenReturn(allStudents);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/print-parallel"))
+                        .get("/student/students/print-parallel"))
                 .andExpect(status().isOk());
     }
 
@@ -248,7 +248,7 @@ public class StudentControllerTest {
         when(studentRepository.findAll()).thenReturn(allStudents);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/print-synchronized"))
+                        .get("/student/students/print-synchronized"))
                 .andExpect(status().isOk());
     }
 }

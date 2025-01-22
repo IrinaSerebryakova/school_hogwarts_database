@@ -27,7 +27,7 @@ public interface StudentService {
 
     List<Student> getStudentsByName(String name);
 
-   List<String> getStudentsByNameStartsWithLetter(String letter);
+    List<String> getStudentsByNameStartsWithLetter(String letter);
 
     List<Student> getStudentsByNameInParallelMode();
 
@@ -36,4 +36,5 @@ public interface StudentService {
     void printName(String s);
 
     void printSynchronized(String name);
+
 }

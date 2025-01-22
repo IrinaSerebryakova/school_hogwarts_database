@@ -108,7 +108,6 @@ public class StudentServiceProduction implements StudentService {
 
 
     int counter = 0;
-    int[] count = {1, 1, 2, 2, 3, 3};
 
     public void printName(String name) {
         System.out.println(name);

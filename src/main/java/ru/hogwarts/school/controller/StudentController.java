@@ -111,7 +111,7 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentsByNameStartsWithLetter(letter));
     }
 
-    @GetMapping("/print-parallel")
+    @GetMapping("/students/print-parallel")
     public ResponseEntity<List<Student>> getStudentsByNameInParallelMode() {
         if (studentService.findAll() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -119,7 +119,7 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentsByNameInParallelMode());
     }
 
-    @GetMapping("/print-synchronized")
+    @GetMapping("/students/print-synchronized")
     public ResponseEntity<List<Student>> getStudentsByNameInSynchronizedMode() {
         if (studentService.findAll() == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
