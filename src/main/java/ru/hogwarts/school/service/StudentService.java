@@ -33,8 +33,6 @@ public interface StudentService {
 
     List<Student> getStudentsByNameInSynchronizedMode();
 
-    void printName(String s);
-
     void printSynchronized(String name);
 
 }

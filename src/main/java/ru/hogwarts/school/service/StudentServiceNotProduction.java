@@ -104,10 +104,6 @@ private String studentUrl;
     }
 
     @Override
-    public void printName(String s) {
-    }
-
-    @Override
     public void printSynchronized(String name) {
     }
 
