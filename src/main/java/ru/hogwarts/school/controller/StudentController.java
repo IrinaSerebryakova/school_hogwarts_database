@@ -2,18 +2,17 @@ package ru.hogwarts.school.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Collection;
+import java.util.List;
 
 import static java.util.Collections.emptyList;
+
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -75,7 +74,7 @@ public class StudentController {
     }
 
     @GetMapping("/average-age")
-    public ResponseEntity<List<Double>> getAverageAge() {
+    public ResponseEntity<List<Long>> getAverageAge() {
         if (studentService.findAll() == null) {
             return ResponseEntity.ok(emptyList());
         }
@@ -105,11 +104,26 @@ public class StudentController {
     }
 
     @GetMapping("/name/{letter}")
-    public ResponseEntity<List<String>> getStudentsByNameStartsWithLetter(@PathVariable("letter") String letter){
+    public ResponseEntity<List<String>> getStudentsByNameStartsWithLetter(@PathVariable("letter") String letter) {
         if (letter.length() != 1 && studentService.findAll() != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(studentService.getStudentsByNameStartsWithLetter(letter));
     }
 
+    @GetMapping("/print-parallel")
+    public ResponseEntity<List<Student>> getStudentsByNameInParallelMode() {
+        if (studentService.findAll() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(studentService.getStudentsByNameInParallelMode());
+    }
+
+    @GetMapping("/print-synchronized")
+    public ResponseEntity<List<Student>> getStudentsByNameInSynchronizedMode() {
+        if (studentService.findAll() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(studentService.getStudentsByNameInSynchronizedMode());
+    }
 }

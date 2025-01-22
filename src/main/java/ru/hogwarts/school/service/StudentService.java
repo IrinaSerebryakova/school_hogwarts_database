@@ -1,16 +1,8 @@
 package ru.hogwarts.school.service;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.hogwarts.school.model.Student;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
 
 public interface StudentService {
     Student createStudent(Student student);
@@ -27,7 +19,7 @@ public interface StudentService {
 
     List<Student> findAll();
 
-    List<Double> getAverageAge();
+    List<Long> getAverageAge();
 
     List<Integer> getCountOfStudents();
 
@@ -36,4 +28,12 @@ public interface StudentService {
     List<Student> getStudentsByName(String name);
 
    List<String> getStudentsByNameStartsWithLetter(String letter);
+
+    List<Student> getStudentsByNameInParallelMode();
+
+    List<Student> getStudentsByNameInSynchronizedMode();
+
+    void printName(String s);
+
+    void printSynchronized(String name);
 }

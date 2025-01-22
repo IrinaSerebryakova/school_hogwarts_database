@@ -69,7 +69,7 @@ private String studentUrl;
     }
 
     @Override
-    public List<Double> getAverageAge() {
+    public List<Long> getAverageAge() {
         return List.of();
     }
 
@@ -92,5 +92,26 @@ private String studentUrl;
     public List<String> getStudentsByNameStartsWithLetter(String letter) {
         return List.of();
     }
+
+    @Override
+    public List<Student> getStudentsByNameInParallelMode() {
+        return List.of();
+    }
+
+    @Override
+    public List<Student> getStudentsByNameInSynchronizedMode() {
+        return List.of();
+    }
+
+    @Override
+    public void printName(String s) {
+
+    }
+
+    @Override
+    public void printSynchronized(String name) {
+
+    }
+
 }
 
