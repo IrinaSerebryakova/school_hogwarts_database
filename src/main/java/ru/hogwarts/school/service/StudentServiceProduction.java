@@ -5,18 +5,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
-import ru.hogwarts.school.exception.StudentNotFoundException;
-import java.util.*;
-import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
+import java.sql.SQLOutput;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -41,7 +40,7 @@ public class StudentServiceProduction implements StudentService {
 
     public Student getStudentById(long id) {
         logger.info("The method 'getStudentById' was called");
-        if(studentRepository.findById(id) == null){
+        if (studentRepository.findById(id).isEmpty()) {
             logger.warn("The method 'findAvatarLocal' throws StudentNotFoundException");
             logger.debug("Please, re-run your application with 'debug'");
         }
@@ -75,10 +74,10 @@ public class StudentServiceProduction implements StudentService {
         return studentRepository.findAll();
     }
 
-    public List<Double> getAverageAge() {
+    public List<Long> getAverageAge() {
         logger.info("The method 'getAverageAge' was called");
         List<Student> allStudents = studentRepository.findAll();
-        double averageAge = allStudents.stream()
+        Long averageAge = (long) allStudents.stream()
                 .mapToInt(Student::getAge)
                 .average()
                 .orElse(0.0);
@@ -94,18 +93,85 @@ public class StudentServiceProduction implements StudentService {
         logger.info("The method 'getFiveLastStudents' was called");
         return studentRepository.getFiveLastStudents();
     }
-
     public List<Student> getStudentsByName(String name) {
         logger.info("The method 'getStudentsByName' was called");
         return studentRepository.getStudentsByName(name);
     }
 
-    public List<String> getStudentsByNameStartsWithLetter(String letter){
+    public List<String> getStudentsByNameStartsWithLetter(String letter) {
         logger.info("The method 'getStudentsByNameStartsWithLetter' {} was called", letter);
         return studentRepository.findAll().stream()
                 .filter(student -> student.getName() != null && student.getName().startsWith(letter))
                 .map(student -> student.getName().toUpperCase())
                 .sorted(Comparator.naturalOrder())
                 .collect((Collectors.toList()));
+    }
+
+    public List<Student> getStudentsByNameInParallelMode() {
+        logger.info("The method 'getStudentsByNameInParallelMode' was called");
+        long start = System.currentTimeMillis();
+        List<Student> students = studentRepository.findAll();
+        int counter = 0;
+
+        PriorityQueue<String> priorityQueue = new PriorityQueue<>();
+        for (int i = 0; i < students.size(); i++) {
+            priorityQueue.offer(students.get(counter).getName());
+            counter++;
+        }
+
+        System.out.println("thread1 : " + priorityQueue.poll());
+        System.out.println("thread1 : " + priorityQueue.poll());
+
+        new Thread(() -> {
+            System.out.println("thread2 : " + priorityQueue.poll());
+            System.out.println("thread2 : " + priorityQueue.poll());
+        }).start();
+
+        new Thread(() -> {
+            System.out.println("thread3 : " + priorityQueue.poll());
+            System.out.println("thread3 : " + priorityQueue.poll());
+        }).start();
+
+        long finish = System.currentTimeMillis();
+        logger.info("The method 'getStudentsByNameInParallelMode' was running: {}", finish);
+        return Collections.emptyList();
+    }
+
+    public final Object lock = new Object();
+
+    public void printSynchronized(String name) {
+        synchronized (lock) {
+            System.out.println(name);
+        }
+    }
+    public List<Student> getStudentsByNameInSynchronizedMode() {
+        logger.info("The method 'getStudentsByNameInSynchronizedMode' was called");
+        long start = System.currentTimeMillis();
+        List<Student> students = studentRepository.findAll();
+        int counter = 0;
+
+        PriorityQueue<String> priorityQueue = new PriorityQueue<>();
+        for (int i = 0; i < students.size(); i++) {
+            priorityQueue.offer(students.get(counter).getName());
+            counter++;
+        }
+
+        printSynchronized("thread1 : " + priorityQueue.poll());
+        printSynchronized("thread1 : " + priorityQueue.poll());
+
+        new Thread(() -> {
+            printSynchronized("thread2 : " + priorityQueue.poll());
+            printSynchronized("thread2 : " + priorityQueue.poll());
+        }).start();
+
+        new Thread(() -> {
+            printSynchronized("thread3 : " + priorityQueue.poll());
+            printSynchronized("thread3 : " + priorityQueue.poll());
+        }).start();
+
+        long finish = System.currentTimeMillis();
+        logger.info("The method 'getStudentsByNameInSynchronizedMode' was running: {}", finish);
+
+        return Collections.emptyList();
     }
 }

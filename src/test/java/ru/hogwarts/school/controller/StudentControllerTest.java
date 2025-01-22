@@ -1,28 +1,35 @@
 
 package ru.hogwarts.school.controller;
 
+import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.bind.annotation.GetMapping;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.*;
 import ru.hogwarts.school.service.AvatarService;
 import ru.hogwarts.school.service.StudentServiceProduction;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,7 +51,7 @@ public class StudentControllerTest {
 
     @SpyBean
     private AvatarService avatarService;
-
+    
     private static final Long NOT_EXIST_ID = 5L;
     private static final Long STUDENT_ID = 5L;
     private static final String STUDENT_NAME = "Мальвина";
@@ -69,7 +76,7 @@ public class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.studentid").value(STUDENT_ID))
+                .andExpect(jsonPath("$.id").value(STUDENT_ID))
                 .andExpect(jsonPath("$.name").value(STUDENT_NAME))
                 .andExpect(jsonPath("$.age").value(STUDENT_AGE));
     }
@@ -111,7 +118,7 @@ public class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.studentid").value(STUDENT_ID))
+                .andExpect(jsonPath("$.id").value(STUDENT_ID))
                 .andExpect(jsonPath("$.name").value(STUDENT_NAME))
                 .andExpect(jsonPath("$.age").value(STUDENT_AGE));
     }
@@ -128,7 +135,7 @@ public class StudentControllerTest {
     @Test
     public void testUpdateStudent() throws Exception {
         JSONObject updateJsonStudent = new JSONObject();
-        updateJsonStudent.put("studentid", STUDENT_ID);
+        updateJsonStudent.put("id", STUDENT_ID);
         updateJsonStudent.put("name", "Валентина");
         updateJsonStudent.put("age", 16);
 
@@ -141,7 +148,7 @@ public class StudentControllerTest {
                         .content(updateJsonStudent.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.studentid").value(STUDENT_ID))
+                .andExpect(jsonPath("$.id").value(STUDENT_ID))
                 .andExpect(jsonPath("$.name").value("Валентина"))
                 .andExpect(jsonPath("$.age").value(16));
     }
@@ -182,13 +189,12 @@ public class StudentControllerTest {
 
     @Test
     public void testGetAverageAge() throws Exception {
-        List<Double> averageAge = List.of(13.0);
+        List<Long> averageAge = List.of(13L);
 
-        when(studentRepository.getAverageAge()).thenReturn(averageAge);
         when(studentServiceProduction.getAverageAge()).thenReturn(averageAge);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/student/average-age"))
+                        .get("/student/average-age"))
                 .andExpect(status().isOk());
     }
 
@@ -204,14 +210,16 @@ public class StudentControllerTest {
                 .andExpect(status().isOk());
     }
 
+    Student testStudent = new Student(0L, STUDENT_NAME, STUDENT_AGE);
+    Student testStudent1 = new Student(1L, STUDENT_NAME, STUDENT_AGE);
+    Student testStudent2 = new Student(2L, STUDENT_NAME, STUDENT_AGE);
+    Student testStudent3 = new Student(3L, STUDENT_NAME, STUDENT_AGE);
+    Student testStudent4 = new Student(4L, STUDENT_NAME, STUDENT_AGE);
+    Student testStudent5 = new Student(5L, STUDENT_NAME, STUDENT_AGE);
+
+
     @Test
     public void testGetFiveLastStudents() throws Exception {
-        Student testStudent1 = new Student(1L, STUDENT_NAME, STUDENT_AGE);
-        Student testStudent2 = new Student(2L, STUDENT_NAME, STUDENT_AGE);
-        Student testStudent3 = new Student(3L, STUDENT_NAME, STUDENT_AGE);
-        Student testStudent4 = new Student(4L, STUDENT_NAME, STUDENT_AGE);
-        Student testStudent5 = new Student(5L, STUDENT_NAME, STUDENT_AGE);
-
         List<Student> fiveLastStudents = List.of(testStudent1, testStudent2, testStudent3, testStudent4, testStudent5);
 
         when(studentRepository.getFiveLastStudents()).thenReturn(fiveLastStudents);
@@ -219,6 +227,28 @@ public class StudentControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/last"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetStudentsByNameInParallelMode() throws Exception {
+        List<Student> allStudents = List.of(testStudent, testStudent1, testStudent2, testStudent3, testStudent4, testStudent5);
+
+        when(studentRepository.findAll()).thenReturn(allStudents);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/students/print-parallel"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetStudentsByNameInSynchronizedMode() throws Exception {
+        List<Student> allStudents = List.of(testStudent, testStudent1, testStudent2, testStudent3, testStudent4, testStudent5);
+
+        when(studentRepository.findAll()).thenReturn(allStudents);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/students/print-synchronized"))
                 .andExpect(status().isOk());
     }
 }
